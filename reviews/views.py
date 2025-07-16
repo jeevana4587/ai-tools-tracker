@@ -87,34 +87,91 @@ def delete_review(request, review_id):
     })
 
 def reviews_dashboard(request):
-    # Get featured reviews
+    """Display all reviews from all tools"""
+    
+    # Get filter form
+    filter_form = ReviewFilterForm(request.GET)
+    
+    # Base queryset - only approved reviews
+    reviews = Review.objects.filter(
+        is_approved=True
+    ).select_related('user', 'tool', 'tool__category').prefetch_related('helpful_votes')
+    
+    # Apply filters
+    if filter_form.is_valid():
+        sort_by = filter_form.cleaned_data.get('sort_by', 'newest')
+        rating_filter = filter_form.cleaned_data.get('rating_filter', 'all')
+        verified_only = filter_form.cleaned_data.get('verified_only', False)
+        
+        # Rating filter
+        if rating_filter and rating_filter != 'all':
+            reviews = reviews.filter(stars=int(rating_filter))
+        
+        # Verified filter
+        if verified_only:
+            reviews = reviews.filter(is_verified=True)
+        
+        # Sorting
+        if sort_by == 'oldest':
+            reviews = reviews.order_by('created_at')
+        elif sort_by == 'highest_rated':
+            reviews = reviews.order_by('-stars', '-created_at')
+        elif sort_by == 'lowest_rated':
+            reviews = reviews.order_by('stars', '-created_at')
+        elif sort_by == 'most_helpful':
+            reviews = reviews.annotate(
+                helpful_count=Count('helpful_votes', filter=Q(helpful_votes__is_helpful=True))
+            ).order_by('-helpful_count', '-created_at')
+        else:  # newest (default)
+            reviews = reviews.order_by('-created_at')
+    else:
+        reviews = reviews.order_by('-created_at')
+    
+    # Search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        reviews = reviews.filter(
+            Q(tool__name__icontains=search_query) |
+            Q(title__icontains=search_query) |
+            Q(comment__icontains=search_query) |
+            Q(user__username__icontains=search_query)
+        )
+    
+    # Category filter
+    category_filter = request.GET.get('category', '')
+    if category_filter:
+        reviews = reviews.filter(tool__category__id=category_filter)
+    
+    # Pagination
+    paginator = Paginator(reviews, 15)  # 15 reviews per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get categories for filter dropdown
+    from tools.models import Category
+    categories = Category.objects.all()
+    
+    # Calculate overall statistics
+    total_reviews = Review.objects.filter(is_approved=True).count()
+    avg_rating = Review.objects.filter(is_approved=True).aggregate(
+        avg=Avg('stars')
+    )['avg'] or 0
+    
+    # Featured and recent reviews for quick access
     featured_reviews = Review.objects.filter(
         is_featured=True, 
         is_approved=True
-    ).select_related('user', 'tool')[:6]
-    
-    # Get recent reviews
-    recent_reviews = Review.objects.filter(
-        is_approved=True
-    ).select_related('user', 'tool').order_by('-created_at')[:10]
-    
-    # Get tools with most reviews
-    popular_tools = Tool.objects.annotate(
-        review_count=Count('reviews', filter=Q(reviews__is_approved=True)),
-        avg_rating=Avg('reviews__stars', filter=Q(reviews__is_approved=True))
-    ).filter(review_count__gt=0).order_by('-review_count')[:10]
-    
-    # Get top rated tools
-    top_rated_tools = Tool.objects.annotate(
-        review_count=Count('reviews', filter=Q(reviews__is_approved=True)),
-        avg_rating=Avg('reviews__stars', filter=Q(reviews__is_approved=True))
-    ).filter(review_count__gte=3).order_by('-avg_rating')[:10]
+    ).select_related('user', 'tool')[:3]
     
     context = {
+        'reviews': page_obj,
+        'filter_form': filter_form,
+        'search_query': search_query,
+        'category_filter': category_filter,
+        'categories': categories,
+        'total_reviews': total_reviews,
+        'avg_rating': avg_rating,
         'featured_reviews': featured_reviews,
-        'recent_reviews': recent_reviews,
-        'popular_tools': popular_tools,
-        'top_rated_tools': top_rated_tools,
     }
     
     return render(request, 'reviews/reviews_dashboard.html', context)
