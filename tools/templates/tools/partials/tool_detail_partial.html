@@ -1,0 +1,19 @@
+<div class="border rounded-lg p-6 shadow bg-white">
+  <h2 class="text-2xl font-bold mb-4">{{ tool.name }}</h2>
+  {% if tool.logo %}
+    <img src="{{ tool.logo.url }}" alt="{{ tool.name }}" class="w-32 h-32 object-contain mb-4">
+  {% endif %}
+
+  <p class="mb-2"><strong>Category:</strong> {{ tool.category.name }}</p>
+  <p class="mb-4">{{ tool.description }}</p>
+
+  <a href="{{ tool.website }}" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+    Visit Website
+  </a>
+
+  {% if tool.is_free %}
+    <span class="ml-4 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">Free</span>
+  {% else %}
+    <span class="ml-4 px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">Paid</span>
+  {% endif %}
+</div>

@@ -1,0 +1,17 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">AI Tools</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {% for tool in tools %}
+    <div class="border p-4 rounded-lg shadow bg-white hover:shadow-xl transition">
+      {% if tool.logo %}
+        <img src="{{ tool.logo.url }}" alt="{{ tool.name }}" class="w-20 h-20 object-contain mb-2">
+      {% endif %}
+      <h3 class="text-xl font-semibold">{{ tool.name }}</h3>
+      <p class="text-sm text-gray-500 mb-2">{{ tool.tool_type }}</p>
+      <p class="text-gray-600 mb-3">{{ tool.description|truncatewords:15 }}</p>
+      <a href="{{ tool.website }}" target="_blank" class="text-blue-600 underline">Visit</a>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

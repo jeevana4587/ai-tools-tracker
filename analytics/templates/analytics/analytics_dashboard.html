@@ -1,0 +1,56 @@
+{% extends "dashboard/base.html" %}
+{% load chart_extras %}
+
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">📊 AI Tool Ratings by Category</h2>
+
+{% if category_charts %}
+  {% for chart in category_charts %}
+    <div class="mb-12">
+      <h3 class="text-xl font-semibold mb-2 text-gray-800">{{ chart.category_name }}</h3>
+      <canvas id="chart-{{ forloop.counter }}"></canvas>
+      <script>
+        const ctx{{ forloop.counter }} = document.getElementById('chart-{{ forloop.counter }}').getContext('2d');
+
+        new Chart(ctx{{ forloop.counter }}, {
+          type: '{{ chart.chart_type }}',
+          data: {
+            labels: {{ chart.tools|pluck:"name"|safe }},
+            datasets: [{
+              label: 'Average Rating',
+              data: {{ chart.tools|pluck:"avg_rating"|safe }},
+              backgroundColor: [
+                '#60A5FA', '#34D399', '#FBBF24', '#F87171',
+                '#A78BFA', '#F472B6', '#4ADE80', '#F9A8D4',
+                '#FDBA74', '#86EFAC'
+              ],
+              borderColor: '#fff',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: {% if chart.chart_type == "pie" %}true{% else %}false{% endif %}
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 5,
+                title: {
+                  display: true,
+                  text: 'Avg Rating'
+                }
+              }
+            }
+          }
+        });
+      </script>
+    </div>
+  {% endfor %}
+{% else %}
+  <p>No rating data available yet.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<h2 class="text-xl font-bold mb-4">My Profile</h2>
+<ul class="list-disc pl-4 space-y-1">
+    <li><strong>Username:</strong> {{ user.username }}</li>
+    <li><strong>Email:</strong> {{ user.email }}</li>
+    <li><strong>Name:</strong> {{ user.userprofile.name }}</li>
+</ul>
+<div class="mt-4 space-x-4">
+    <a href="{% url 'users:password_change' %}" class="text-blue-600 underline">Change Password</a>
+    <a href="{% url 'users:user_settings' %}" class="text-blue-600 underline">Edit Settings</a>
+</div>
+{% endblock %}

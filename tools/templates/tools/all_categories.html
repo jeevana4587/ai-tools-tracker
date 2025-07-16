@@ -1,0 +1,11 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">Explore by Category</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+  {% for category in categories %}
+    <a href="{% url 'tools:by_category' category.id %}" class="bg-gradient-to-r from-blue-400 to-purple-500 text-white p-6 rounded-xl shadow-lg hover:scale-105 transition transform text-center">
+      <span class="text-xl font-semibold">{{ category.name }}</span>
+    </a>
+  {% endfor %}
+</div>
+{% endblock %}

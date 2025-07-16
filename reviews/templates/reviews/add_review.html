@@ -1,0 +1,26 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-8 p-6 bg-white shadow rounded-lg">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <h2 class="text-2xl font-bold mb-4">
+        {{ existing|yesno:"Edit,Add" }} Review for "{{ tool.name }}"
+    </h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-2 hover:bg-blue-700">
+            Save Review
+        </button>
+    </form>
+</div>
+{% endblock %}

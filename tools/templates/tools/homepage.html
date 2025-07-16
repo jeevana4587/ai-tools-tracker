@@ -1,0 +1,29 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Featured Tools</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+  {% for tool in tools %}
+    <button 
+      hx-get="{% url 'tools:detail' tool.id %}" 
+      hx-target="#tool-details" 
+      hx-swap="innerHTML"
+      class="p-4 bg-white rounded-xl shadow hover:shadow-xl transition">
+      
+      <div class="flex items-center gap-4">
+        {% if tool.logo %}
+          <img src="{{ tool.logo.url }}" alt="{{ tool.name }}" class="w-12 h-12 object-contain">
+        {% endif %}
+        <div>
+          <h3 class="text-lg font-semibold">{{ tool.name }}</h3>
+          <p class="text-sm text-gray-500">{{ tool.is_paid }}</p>
+        </div>
+      </div>
+    </button>
+  {% endfor %}
+</div>
+
+<div id="tool-details" class="mt-6">
+  <!-- Tool detail will load here on click -->
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+<h2 class="text-xl font-bold mb-4">Help</h2>
+{% if help_text %}
+  <div class="prose max-w-none">
+    {{ help_text.content|linebreaks }}
+  </div>
+{% else %}
+  <p class="text-red-600">Help content is not available in your selected language.</p>
+{% endif %}
+{% endblock %}

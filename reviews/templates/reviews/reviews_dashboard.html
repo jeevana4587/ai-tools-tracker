@@ -1,0 +1,17 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">Tools with Reviews</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  {% for tool in tools %}
+    <a href="{% url 'reviews:tool_reviews' tool.id %}" class="block border rounded-lg p-4 shadow bg-white hover:shadow-md transition">
+      <div class="flex items-center gap-4 mb-2">
+        {% if tool.logo %}
+          <img src="{{ tool.logo.url }}" alt="{{ tool.name }}" class="w-12 h-12 object-contain">
+        {% endif %}
+        <h3 class="text-lg font-semibold">{{ tool.name }}</h3>
+      </div>
+      <p class="text-sm text-gray-600">{{ tool.reviews.count }} review(s)</p>
+    </a>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<div class="max-w-6xl mx-auto mt-10">
+  <h2 class="text-3xl font-bold mb-6">Browse by Categories</h2>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {% for category in categories %}
+      <a href="{% url 'tools:by_category' category.id %}" class="flex items-center justify-center p-6 rounded-full shadow-md bg-blue-100 hover:bg-blue-200 transition-all text-center">
+        <span class="text-xl font-semibold">{{ category.name }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

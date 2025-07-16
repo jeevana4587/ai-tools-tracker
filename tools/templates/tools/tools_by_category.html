@@ -1,0 +1,38 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<div class="max-w-6xl mx-auto mt-8">
+  <h2 class="text-3xl font-bold mb-6 text-gray-800">AI Tools in "{{ category.name }}"</h2>
+
+  {% if tools %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for tool in tools %}
+        <a href="{% url 'tools:tool_detail' tool.id %}" class="block bg-white p-6 rounded-xl shadow hover:shadow-lg transition hover:border-blue-500 border border-transparent">
+          <div class="flex items-center gap-4 mb-3">
+            {% if tool.logo %}
+              <img src="{{ tool.logo.url }}" alt="{{ tool.name }}" class="w-16 h-16 object-contain">
+            {% endif %}
+            <h3 class="text-xl font-semibold text-gray-900">{{ tool.name }}</h3>
+          </div>
+
+          <p class="text-gray-700 mb-3">{{ tool.description|truncatewords:25 }}</p>
+
+          <p class="text-sm mb-2">
+            <strong>Access Type:</strong>
+            {% if tool.access_type == 'Free' %}
+              <span class="text-green-600 font-semibold">Free</span>
+            {% elif tool.access_type == 'Paid' %}
+              <span class="text-red-600 font-semibold">Paid</span>
+            {% else %}
+              <span class="text-yellow-600 font-semibold">Freemium</span>
+            {% endif %}
+          </p>
+
+          <span class="text-blue-600 font-medium underline">View Details →</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-gray-600">No tools found in this category.</p>
+  {% endif %}
+</div>
+{% endblock %}

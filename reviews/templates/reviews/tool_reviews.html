@@ -1,0 +1,17 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-4">Reviews for {{ tool.name }}</h2>
+{% if tool.reviews.all %}
+  <ul class="space-y-4">
+    {% for review in tool.reviews.all %}
+      <li class="border-b pb-2">
+        <strong>{{ review.user.username }}</strong> rated {{ review.stars }}★<br>
+        <small class="text-gray-500">{{ review.created_at }}</small><br>
+        {{ review.comment }}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No reviews yet for this tool.</p>
+{% endif %}
+{% endblock %}

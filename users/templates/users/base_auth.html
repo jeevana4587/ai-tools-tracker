@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}AI Tools Tracker{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: url("{% static 'images/bg.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .auth-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.142);
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center px-4">
+  <div class="auth-card p-10 w-full max-w-lg text-white">
+    {% block content %}
+    {% endblock %}
+  </div>
+</body>
+</html>

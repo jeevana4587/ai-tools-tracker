@@ -1,0 +1,23 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">📜 Your Tool History</h2>
+
+{% if history %}
+  <ul class="space-y-4">
+    {% for record in history %}
+      <li class="bg-white p-4 rounded shadow flex items-center gap-4">
+        {% if record.tool.logo %}
+          <img src="{{ record.tool.logo.url }}" alt="{{ record.tool.name }}" class="w-12 h-12 object-contain">
+        {% endif %}
+        <div>
+          <h3 class="text-lg font-semibold">{{ record.tool.name }}</h3>
+          <p class="text-sm text-gray-600">Category: {{ record.tool.category.name }}</p>
+          <p class="text-xs text-gray-500">Viewed on {{ record.accessed_at|date:"M d, Y H:i" }}</p>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>You haven’t viewed any tools yet.</p>
+{% endif %}
+{% endblock %}

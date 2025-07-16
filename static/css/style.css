@@ -1,0 +1,85 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f0f2f5;
+}
+
+.auth-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+.auth-left {
+  background: #0da678;
+  color: white;
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 0% 100%);
+}
+
+.auth-left h1 {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.auth-left p {
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.btn-outline {
+  background: none;
+  color: white;
+  padding: 10px 25px;
+  border: 2px solid white;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-right {
+  width: 60%;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 100px;
+}
+
+.auth-right h2 {
+  margin-bottom: 30px;
+  color: #333;
+}
+
+form input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  font-size: 14px;
+}
+
+form button.btn {
+  width: 100%;
+  background: #0da678;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.alt {
+  margin-top: 15px;
+  font-size: 14px;
+}

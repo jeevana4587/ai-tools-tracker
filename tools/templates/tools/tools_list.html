@@ -1,0 +1,34 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<h2 class="text-2xl font-bold mb-6">All AI Tools</h2>
+
+
+<form method="get" class="mb-6 flex space-x-4">
+  <select name="category" class="border rounded p-2">
+    <option value="">All Categories</option>
+    {% for cat in categories %}
+      <option value="{{ cat.id }}" {% if cat.id|stringformat:"s" == request.GET.category %}selected{% endif %}>{{ cat.name }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Filter</button>
+</form>
+
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {% for tool in tools %}
+  <div class="bg-white shadow rounded p-4">
+    {% if tool.logo %}
+    <img src="{{ tool.logo.url }}" alt="{{ tool.name }}" class="h-20 mx-auto mb-4 object-contain">
+    {% endif %}
+    <h3 class="text-lg font-bold">{{ tool.name }}</h3>
+    <p class="text-gray-600 text-sm mb-2">{{ tool.description|truncatewords:15 }}</p>
+    <p class="font-semibold {% if tool.is_free %}text-green-600{% else %}text-red-600{% endif %}">
+      {{ tool.is_free|yesno:"Free,Paid" }}
+    </p>
+    <a href="{{ tool.website }}" target="_blank" class="mt-2 inline-block text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded">Visit</a>
+  </div>
+  {% empty %}
+    <p>No tools available.</p>
+  {% endfor %}
+</div>
+{% endblock %}
