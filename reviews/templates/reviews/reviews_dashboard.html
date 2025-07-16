@@ -1,17 +1,207 @@
 {% extends "dashboard/base.html" %}
+
 {% block content %}
-<h2 class="text-2xl font-bold mb-6">Tools with Reviews</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-  {% for tool in tools %}
-    <a href="{% url 'reviews:tool_reviews' tool.id %}" class="block border rounded-lg p-4 shadow bg-white hover:shadow-md transition">
-      <div class="flex items-center gap-4 mb-2">
-        {% if tool.logo %}
-          <img src="{{ tool.logo.url }}" alt="{{ tool.name }}" class="w-12 h-12 object-contain">
+<div class="max-w-7xl mx-auto">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Reviews Dashboard</h1>
+        <p class="text-gray-600">Discover what users are saying about AI tools</p>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <a href="{% url 'reviews:my_reviews' %}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
+            <div class="flex items-center">
+                <div class="bg-blue-100 rounded-lg p-3">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-900">My Reviews</h3>
+                    <p class="text-gray-600">View and manage your reviews</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'tools:categories' %}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
+            <div class="flex items-center">
+                <div class="bg-green-100 rounded-lg p-3">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Browse Tools</h3>
+                    <p class="text-gray-600">Find tools to review</p>
+                </div>
+            </div>
+        </a>
+
+        {% if request.user.is_staff %}
+        <a href="{% url 'reviews:analytics' %}" class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
+            <div class="flex items-center">
+                <div class="bg-purple-100 rounded-lg p-3">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Analytics</h3>
+                    <p class="text-gray-600">Review statistics & insights</p>
+                </div>
+            </div>
+        </a>
         {% endif %}
-        <h3 class="text-lg font-semibold">{{ tool.name }}</h3>
-      </div>
-      <p class="text-sm text-gray-600">{{ tool.reviews.count }} review(s)</p>
-    </a>
-  {% endfor %}
+    </div>
+
+    <!-- Featured Reviews -->
+    {% if featured_reviews %}
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Featured Reviews</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for review in featured_reviews %}
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center mb-4">
+                    {% if review.tool.logo %}
+                        <img src="{{ review.tool.logo.url }}" alt="{{ review.tool.name }}" class="w-10 h-10 object-contain rounded mr-3">
+                    {% endif %}
+                    <div>
+                        <h3 class="font-semibold text-gray-900">{{ review.tool.name }}</h3>
+                        <div class="flex items-center">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.stars %}
+                                    <span class="text-yellow-400">★</span>
+                                {% else %}
+                                    <span class="text-gray-300">★</span>
+                                {% endif %}
+                            {% endfor %}
+                            {% if review.is_verified %}
+                                <span class="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Verified</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% if review.title %}
+                    <h4 class="font-medium text-gray-900 mb-2">{{ review.title }}</h4>
+                {% endif %}
+                <p class="text-gray-600 text-sm mb-3">{{ review.comment|truncatewords:20 }}</p>
+                <div class="flex items-center justify-between text-sm text-gray-500">
+                    <span>by {{ review.user.username }}</span>
+                    <a href="{% url 'reviews:tool_reviews' review.tool.id %}" class="text-blue-600 hover:text-blue-800">Read more</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Reviews and Popular Tools -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Recent Reviews -->
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Recent Reviews</h2>
+            <div class="bg-white rounded-lg shadow">
+                {% for review in recent_reviews %}
+                <div class="p-4 {% if not forloop.last %}border-b border-gray-200{% endif %}">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center">
+                            <span class="font-medium text-gray-900">{{ review.user.username }}</span>
+                            <span class="mx-2 text-gray-500">reviewed</span>
+                            <a href="{% url 'reviews:tool_reviews' review.tool.id %}" class="text-blue-600 hover:text-blue-800 font-medium">{{ review.tool.name }}</a>
+                        </div>
+                        <div class="flex items-center">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.stars %}
+                                    <span class="text-yellow-400 text-sm">★</span>
+                                {% else %}
+                                    <span class="text-gray-300 text-sm">★</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% if review.title %}
+                        <p class="font-medium text-gray-900 text-sm mb-1">{{ review.title }}</p>
+                    {% endif %}
+                    <p class="text-gray-600 text-sm mb-2">{{ review.comment|truncatewords:15 }}</p>
+                    <span class="text-xs text-gray-500">{{ review.created_at|timesince }} ago</span>
+                </div>
+                {% empty %}
+                <div class="p-4 text-center text-gray-500">
+                    No reviews yet. Be the first to review a tool!
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Popular Tools -->
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Most Reviewed Tools</h2>
+            <div class="bg-white rounded-lg shadow">
+                {% for tool in popular_tools %}
+                <div class="p-4 {% if not forloop.last %}border-b border-gray-200{% endif %}">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            {% if tool.logo %}
+                                <img src="{{ tool.logo.url }}" alt="{{ tool.name }}" class="w-8 h-8 object-contain rounded mr-3">
+                            {% endif %}
+                            <div>
+                                <a href="{% url 'reviews:tool_reviews' tool.id %}" class="font-medium text-gray-900 hover:text-blue-600">{{ tool.name }}</a>
+                                <div class="flex items-center mt-1">
+                                    {% if tool.avg_rating %}
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= tool.avg_rating %}
+                                                <span class="text-yellow-400 text-xs">★</span>
+                                            {% else %}
+                                                <span class="text-gray-300 text-xs">★</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <span class="text-xs text-gray-500 ml-1">({{ tool.avg_rating|floatformat:1 }})</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-gray-900">{{ tool.review_count }}</div>
+                            <div class="text-xs text-gray-500">review{{ tool.review_count|pluralize }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="p-4 text-center text-gray-500">
+                    No tools have been reviewed yet.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Rated Tools -->
+    {% if top_rated_tools %}
+    <div class="mt-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Top Rated Tools</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {% for tool in top_rated_tools %}
+            <a href="{% url 'reviews:tool_reviews' tool.id %}" class="bg-white rounded-lg shadow p-4 hover:shadow-lg transition">
+                <div class="text-center">
+                    {% if tool.logo %}
+                        <img src="{{ tool.logo.url }}" alt="{{ tool.name }}" class="w-12 h-12 object-contain mx-auto mb-2">
+                    {% endif %}
+                    <h3 class="font-medium text-gray-900 mb-1">{{ tool.name }}</h3>
+                    <div class="flex items-center justify-center mb-1">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= tool.avg_rating %}
+                                <span class="text-yellow-400 text-sm">★</span>
+                            {% else %}
+                                <span class="text-gray-300 text-sm">★</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="text-xs text-gray-500">{{ tool.avg_rating|floatformat:1 }} ({{ tool.review_count }} review{{ tool.review_count|pluralize }})</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

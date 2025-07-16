@@ -1,20 +1,18 @@
-{% extends "dashboard/base.html" %}
+{% extends "reviews/add_review.html" %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto">
     <div class="bg-white shadow-lg rounded-lg overflow-hidden">
         <!-- Header -->
-        <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-8">
+        <div class="bg-gradient-to-r from-orange-600 to-red-600 px-6 py-8">
             <div class="flex items-center">
                 {% if tool.logo %}
                     <img src="{{ tool.logo.url }}" alt="{{ tool.name }}" class="w-16 h-16 object-contain rounded-lg mr-6 bg-white p-2">
                 {% endif %}
                 <div class="text-white">
-                    <h1 class="text-3xl font-bold mb-2">
-                        {{ existing|yesno:"Edit Your Review,Write a Review" }}
-                    </h1>
-                    <p class="text-blue-100 text-lg">{{ tool.name }}</p>
-                    <p class="text-blue-200 text-sm mt-2">{{ tool.description|truncatewords:15 }}</p>
+                    <h1 class="text-3xl font-bold mb-2">Edit Your Review</h1>
+                    <p class="text-orange-100 text-lg">{{ tool.name }}</p>
+                    <p class="text-orange-200 text-sm mt-2">{{ tool.description|truncatewords:15 }}</p>
                 </div>
             </div>
         </div>
@@ -97,16 +95,15 @@
                     </div>
                 </div>
 
-                <!-- Review Guidelines -->
-                <div class="bg-blue-50 p-4 rounded-lg">
-                    <h3 class="text-sm font-semibold text-blue-900 mb-2">📝 Review Guidelines</h3>
-                    <ul class="text-sm text-blue-800 space-y-1">
-                        <li>• Be honest and constructive in your feedback</li>
-                        <li>• Focus on your personal experience with the tool</li>
-                        <li>• Avoid offensive language or personal attacks</li>
-                        <li>• Include specific examples when possible</li>
-                        <li>• Consider both strengths and areas for improvement</li>
-                    </ul>
+                <!-- Review Info -->
+                <div class="bg-orange-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-semibold text-orange-900 mb-2">📝 Editing Your Review</h3>
+                    <p class="text-sm text-orange-800">
+                        Original review posted: {{ review.created_at|date:"M d, Y" }}
+                        {% if review.updated_at != review.created_at %}
+                            <br>Last updated: {{ review.updated_at|date:"M d, Y" }}
+                        {% endif %}
+                    </p>
                 </div>
 
                 <!-- Action Buttons -->
@@ -118,8 +115,8 @@
                         <button type="button" onclick="window.history.back()" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition">
                             Cancel
                         </button>
-                        <button type="submit" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 font-semibold transition shadow-lg">
-                            {{ existing|yesno:"Update Review,Publish Review" }}
+                        <button type="submit" class="px-8 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:from-orange-700 hover:to-red-700 font-semibold transition shadow-lg">
+                            Update Review
                         </button>
                     </div>
                 </div>
@@ -147,34 +144,4 @@
         </div>
     </div>
 </div>
-
-<script>
-// Auto-save draft functionality (optional enhancement)
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form');
-    const inputs = form.querySelectorAll('input, textarea, select');
-    
-    // Load saved draft
-    inputs.forEach(input => {
-        const savedValue = localStorage.getItem(`review_draft_${input.name}`);
-        if (savedValue && !input.value) {
-            input.value = savedValue;
-        }
-    });
-    
-    // Save draft on input
-    inputs.forEach(input => {
-        input.addEventListener('input', function() {
-            localStorage.setItem(`review_draft_${input.name}`, input.value);
-        });
-    });
-    
-    // Clear draft on successful submit
-    form.addEventListener('submit', function() {
-        inputs.forEach(input => {
-            localStorage.removeItem(`review_draft_${input.name}`);
-        });
-    });
-});
-</script>
 {% endblock %}

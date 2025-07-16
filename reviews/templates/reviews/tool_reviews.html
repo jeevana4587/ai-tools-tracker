@@ -1,17 +1,318 @@
 {% extends "dashboard/base.html" %}
+
 {% block content %}
-<h2 class="text-2xl font-bold mb-4">Reviews for {{ tool.name }}</h2>
-{% if tool.reviews.all %}
-  <ul class="space-y-4">
-    {% for review in tool.reviews.all %}
-      <li class="border-b pb-2">
-        <strong>{{ review.user.username }}</strong> rated {{ review.stars }}★<br>
-        <small class="text-gray-500">{{ review.created_at }}</small><br>
-        {{ review.comment }}
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>No reviews yet for this tool.</p>
-{% endif %}
+<div class="max-w-7xl mx-auto">
+    <!-- Tool Header -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                {% if tool.logo %}
+                    <img src="{{ tool.logo.url }}" alt="{{ tool.name }}" class="w-16 h-16 object-contain rounded-lg mr-6">
+                {% endif %}
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ tool.name }}</h1>
+                    <p class="text-gray-600 mb-4">{{ tool.description|truncatewords:20 }}</p>
+                    <div class="flex items-center space-x-4">
+                        <a href="{{ tool.website }}" target="_blank" class="text-blue-600 hover:text-blue-800">Visit Website</a>
+                        <span class="text-gray-400">|</span>
+                        <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">{{ tool.category.name }}</span>
+                        <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">{{ tool.access_type }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add Review Button -->
+            {% if user.is_authenticated %}
+                {% if user_review %}
+                    <div class="text-right">
+                        <a href="{% url 'reviews:edit_review' user_review.id %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition mb-2 block">
+                            Edit My Review
+                        </a>
+                        <a href="{% url 'reviews:delete_review' user_review.id %}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition block">
+                            Delete My Review
+                        </a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'reviews:add_review' tool.id %}" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition">
+                        Write a Review
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'users:login' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                    Login to Review
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Review Statistics -->
+    {% if stats.total_reviews > 0 %}
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Review Statistics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Overall Rating -->
+            <div class="text-center">
+                <div class="text-5xl font-bold text-gray-900 mb-2">{{ stats.avg_rating|floatformat:1 }}</div>
+                <div class="flex items-center justify-center mb-2">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= stats.avg_rating %}
+                            <span class="text-yellow-400 text-2xl">★</span>
+                        {% else %}
+                            <span class="text-gray-300 text-2xl">★</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="text-gray-600">Based on {{ stats.total_reviews }} review{{ stats.total_reviews|pluralize }}</div>
+            </div>
+            
+            <!-- Rating Breakdown -->
+            <div class="space-y-2">
+                {% for star in "54321" %}
+                    {% with star_num=star|add:0 %}
+                    <div class="flex items-center">
+                        <span class="text-sm font-medium text-gray-700 w-12">{{ star_num }} star</span>
+                        <div class="flex-1 mx-3 bg-gray-200 rounded-full h-2">
+                            {% if stats.total_reviews > 0 %}
+                                {% if star_num == 5 %}
+                                    {% widthratio stats.five_star stats.total_reviews 100 as width %}
+                                {% elif star_num == 4 %}
+                                    {% widthratio stats.four_star stats.total_reviews 100 as width %}
+                                {% elif star_num == 3 %}
+                                    {% widthratio stats.three_star stats.total_reviews 100 as width %}
+                                {% elif star_num == 2 %}
+                                    {% widthratio stats.two_star stats.total_reviews 100 as width %}
+                                {% else %}
+                                    {% widthratio stats.one_star stats.total_reviews 100 as width %}
+                                {% endif %}
+                                <div class="bg-yellow-400 h-2 rounded-full" style="width: {{ width }}%"></div>
+                            {% endif %}
+                        </div>
+                        <span class="text-sm text-gray-600 w-8">
+                            {% if star_num == 5 %}{{ stats.five_star }}
+                            {% elif star_num == 4 %}{{ stats.four_star }}
+                            {% elif star_num == 3 %}{{ stats.three_star }}
+                            {% elif star_num == 2 %}{{ stats.two_star }}
+                            {% else %}{{ stats.one_star }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Filters and Sorting -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <form method="get" class="flex flex-wrap items-center gap-4">
+            <div class="flex items-center space-x-4">
+                <label for="{{ filter_form.sort_by.id_for_label }}" class="text-sm font-medium text-gray-700">Sort by:</label>
+                {{ filter_form.sort_by }}
+            </div>
+            <div class="flex items-center space-x-4">
+                <label for="{{ filter_form.rating_filter.id_for_label }}" class="text-sm font-medium text-gray-700">Rating:</label>
+                {{ filter_form.rating_filter }}
+            </div>
+            <div class="flex items-center space-x-2">
+                {{ filter_form.verified_only }}
+                <label for="{{ filter_form.verified_only.id_for_label }}" class="text-sm text-gray-700">{{ filter_form.verified_only.label }}</label>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                Apply Filters
+            </button>
+            <a href="{% url 'reviews:tool_reviews' tool.id %}" class="text-gray-600 hover:text-gray-800">Clear Filters</a>
+        </form>
+    </div>
+
+    <!-- Reviews List -->
+    <div class="space-y-6">
+        {% for review in reviews %}
+        <div class="bg-white rounded-lg shadow p-6">
+            <!-- Review Header -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="bg-gray-100 rounded-full w-10 h-10 flex items-center justify-center mr-4">
+                        <span class="text-gray-600 font-semibold">{{ review.user.username|first|upper }}</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center">
+                            <span class="font-semibold text-gray-900 mr-2">{{ review.user.username }}</span>
+                            {% if review.is_verified %}
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2">Verified</span>
+                            {% endif %}
+                            {% if review.is_featured %}
+                                <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">Featured</span>
+                            {% endif %}
+                        </div>
+                        <div class="flex items-center mt-1">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.stars %}
+                                    <span class="text-yellow-400">★</span>
+                                {% else %}
+                                    <span class="text-gray-300">★</span>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="text-gray-600 text-sm ml-2">{{ review.created_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Review Actions -->
+                {% if user.is_authenticated and user != review.user %}
+                <div class="flex items-center space-x-2">
+                    <a href="{% url 'reviews:report_review' review.id %}" class="text-gray-400 hover:text-red-600 text-sm">Report</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Review Content -->
+            {% if review.title %}
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ review.title }}</h3>
+            {% endif %}
+            
+            {% if review.comment %}
+                <p class="text-gray-700 mb-4">{{ review.comment }}</p>
+            {% endif %}
+
+            <!-- Pros and Cons -->
+            {% if review.pros or review.cons %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                {% if review.pros %}
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-green-800 mb-2">👍 Pros</h4>
+                    <p class="text-green-700 text-sm">{{ review.pros }}</p>
+                </div>
+                {% endif %}
+                
+                {% if review.cons %}
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-red-800 mb-2">👎 Cons</h4>
+                    <p class="text-red-700 text-sm">{{ review.cons }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Helpful Voting -->
+            {% if user.is_authenticated and user != review.user %}
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600">Was this review helpful?</span>
+                    <form method="post" action="{% url 'reviews:vote_helpful' review.id %}" class="inline helpful-vote-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="is_helpful" value="true">
+                        <button type="submit" class="flex items-center text-green-600 hover:text-green-800 text-sm">
+                            👍 Yes (<span class="helpful-count">{{ review.helpful_votes_count }}</span>)
+                        </button>
+                    </form>
+                    <form method="post" action="{% url 'reviews:vote_helpful' review.id %}" class="inline helpful-vote-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="is_helpful" value="false">
+                        <button type="submit" class="flex items-center text-red-600 hover:text-red-800 text-sm">
+                            👎 No (<span class="not-helpful-count">{{ review.not_helpful_votes_count }}</span>)
+                        </button>
+                    </form>
+                </div>
+                {% if review.updated_at != review.created_at %}
+                    <span class="text-xs text-gray-500">Updated {{ review.updated_at|timesince }} ago</span>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="pt-4 border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4 text-sm text-gray-600">
+                        <span>👍 {{ review.helpful_votes_count }} helpful</span>
+                        <span>👎 {{ review.not_helpful_votes_count }} not helpful</span>
+                    </div>
+                    {% if review.updated_at != review.created_at %}
+                        <span class="text-xs text-gray-500">Updated {{ review.updated_at|timesince }} ago</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="bg-white rounded-lg shadow p-8 text-center">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+            </svg>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">No reviews yet</h3>
+            <p class="text-gray-600 mb-6">Be the first to review {{ tool.name }} and help others make informed decisions.</p>
+            {% if user.is_authenticated %}
+                <a href="{% url 'reviews:add_review' tool.id %}" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition">
+                    Write the First Review
+                </a>
+            {% else %}
+                <a href="{% url 'users:login' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                    Login to Write a Review
+                </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if reviews.has_other_pages %}
+    <div class="mt-8 flex justify-center">
+        <nav class="flex items-center space-x-2">
+            {% if reviews.has_previous %}
+                <a href="?page={{ reviews.previous_page_number }}" class="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Previous</a>
+            {% endif %}
+            
+            {% for page_num in reviews.paginator.page_range %}
+                {% if page_num == reviews.number %}
+                    <span class="px-3 py-2 rounded-lg bg-blue-600 text-white">{{ page_num }}</span>
+                {% elif page_num > reviews.number|add:'-3' and page_num < reviews.number|add:'3' %}
+                    <a href="?page={{ page_num }}" class="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">{{ page_num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if reviews.has_next %}
+                <a href="?page={{ reviews.next_page_number }}" class="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Next</a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Handle helpful voting via AJAX
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('.helpful-vote-form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const url = form.action;
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    // Update counts
+                    const reviewDiv = form.closest('.bg-white');
+                    const helpfulCount = reviewDiv.querySelector('.helpful-count');
+                    const notHelpfulCount = reviewDiv.querySelector('.not-helpful-count');
+                    
+                    if (helpfulCount) helpfulCount.textContent = data.helpful_count;
+                    if (notHelpfulCount) notHelpfulCount.textContent = data.not_helpful_count;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+});
+</script>
 {% endblock %}
