@@ -6,6 +6,9 @@
 
 <form method="post" class="space-y-4">
     {% csrf_token %}
+    {% if form.errors %}
+      <div class="text-red-600">{{ form.errors }}</div>
+    {% endif %}
     
     <div>
         <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium mb-1">Username</label>

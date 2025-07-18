@@ -1,9 +1,9 @@
 {% extends "dashboard/base.html" %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white p-6 rounded shadow text-center">
-  <h2 class="text-2xl font-bold mb-4">🎉 Thank You!</h2>
-  <p>Your feedback has been submitted successfully.</p>
-  <a href="{% url 'tools:categories' %}" class="text-blue-600 underline mt-4 inline-block">← Go back to Tools</a>
+<div class="max-w-2xl mx-auto {% if user_theme == 'dark' %}bg-gray-800{% else %}bg-white{% endif %} p-6 rounded shadow text-center">
+  <h2 class="text-2xl font-bold mb-4 {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">🎉 Thank You!</h2>
+  <p class="{% if user_theme == 'dark' %}text-gray-200{% else %}text-gray-700{% endif %} mb-4">Your feedback has been submitted successfully. We appreciate your input!</p>
+  <a href="{% url 'tools:categories' %}" class="text-blue-600 hover:text-blue-700 underline mt-4 inline-block transition duration-200">← Go back to Tools</a>
 </div>
 {% endblock %}

@@ -32,5 +32,5 @@ class Tool(models.Model):
 
     class Meta:
         verbose_name = "Tool"
-        verbose_name_plural = "Tool"
+        verbose_name_plural = "Tools"
 

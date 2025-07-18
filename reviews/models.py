@@ -8,7 +8,7 @@ class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tool = models.ForeignKey(Tool, on_delete=models.CASCADE, related_name='reviews')
     stars = models.IntegerField(choices=RATING_CHOICES)
-    comment = models.TextField(blank=True)
+    review = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

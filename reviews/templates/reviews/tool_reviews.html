@@ -1,17 +1,18 @@
 {% extends "dashboard/base.html" %}
 {% block content %}
-<h2 class="text-2xl font-bold mb-4">Reviews for {{ tool.name }}</h2>
+<h2 class="text-2xl font-bold mb-4 {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">Reviews for {{ tool.name }}</h2>
 {% if tool.reviews.all %}
   <ul class="space-y-4">
     {% for review in tool.reviews.all %}
-      <li class="border-b pb-2">
-        <strong>{{ review.user.username }}</strong> rated {{ review.stars }}★<br>
-        <small class="text-gray-500">{{ review.created_at }}</small><br>
-        {{ review.comment }}
+      <li class="border-b pb-2 {% if user_theme == 'dark' %}border-gray-600{% else %}border-gray-200{% endif %}">
+        <strong class="{% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">{{ review.user.username }}</strong> 
+        <span class="{% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">rated {{ review.stars }}★</span><br>
+        <small class="{% if user_theme == 'dark' %}text-gray-400{% else %}text-gray-500{% endif %}">{{ review.created_at }}</small><br>
+        <span class="{% if user_theme == 'dark' %}text-gray-200{% else %}text-black{% endif %}">{{ review.comment }}</span>
       </li>
     {% endfor %}
   </ul>
 {% else %}
-  <p>No reviews yet for this tool.</p>
+  <p class="{% if user_theme == 'dark' %}text-gray-200{% else %}text-black{% endif %}">No reviews yet for this tool.</p>
 {% endif %}
 {% endblock %}

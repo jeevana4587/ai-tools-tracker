@@ -20,14 +20,6 @@ class UserSettings(models.Model):
     LANGUAGE_CHOICES = [
         ('en', 'English'),
         ('te', 'Telugu'),
-        ('hi', 'Hindi'),
-        ('ta', 'Tamil'),
-        ('kn', 'Kannada'),
-        ('ml', 'Malayalam'),
-        ('fr', 'French'),
-        ('de', 'German'),
-        ('es', 'Spanish'),
-        ('it', 'Italian'),
     ]
 
     THEME_CHOICES = [

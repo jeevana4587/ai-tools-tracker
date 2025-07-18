@@ -2,55 +2,206 @@
 {% load chart_extras %}
 
 {% block content %}
-<h2 class="text-2xl font-bold mb-6">📊 AI Tool Ratings by Category</h2>
+<div class="space-y-8">
+  <!-- Header -->
+  <div class="flex justify-between items-center">
+    <h2 class="text-3xl font-bold {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">📊 Analytics Dashboard</h2>
+    <div class="text-sm {% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %}">
+      Last updated: {{ "now"|date:"M d, Y H:i" }}
+    </div>
+  </div>
 
-{% if category_charts %}
+  <!-- Overview Statistics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="{% if user_theme == 'dark' %}bg-gray-800 border-gray-600{% else %}bg-white border-gray-200{% endif %} border rounded-lg p-6 shadow">
+      <div class="flex items-center">
+        <div class="p-2 bg-blue-100 rounded-lg">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium {% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %}">Total Tools</p>
+          <p class="text-2xl font-bold {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">{{ total_tools }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="{% if user_theme == 'dark' %}bg-gray-800 border-gray-600{% else %}bg-white border-gray-200{% endif %} border rounded-lg p-6 shadow">
+      <div class="flex items-center">
+        <div class="p-2 bg-green-100 rounded-lg">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium {% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %}">Avg Rating</p>
+          <p class="text-2xl font-bold {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">{{ avg_overall_rating|floatformat:1 }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="{% if user_theme == 'dark' %}bg-gray-800 border-gray-600{% else %}bg-white border-gray-200{% endif %} border rounded-lg p-6 shadow">
+      <div class="flex items-center">
+        <div class="p-2 bg-purple-100 rounded-lg">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium {% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %}">Total Users</p>
+          <p class="text-2xl font-bold {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">{{ total_users }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="{% if user_theme == 'dark' %}bg-gray-800 border-gray-600{% else %}bg-white border-gray-200{% endif %} border rounded-lg p-6 shadow">
+      <div class="flex items-center">
+        <div class="p-2 bg-yellow-100 rounded-lg">
+          <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium {% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %}">Total Reviews</p>
+          <p class="text-2xl font-bold {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">{{ total_reviews }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Access Type Distribution Chart -->
+  <div class="{% if user_theme == 'dark' %}bg-gray-800 border-gray-600{% else %}bg-white border-gray-200{% endif %} border rounded-lg p-6 shadow">
+    <h3 class="text-xl font-semibold mb-4 {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">Access Type Distribution</h3>
+    <div class="flex justify-center">
+      <div style="width: 300px; height: 300px;">
+        <canvas id="accessTypeChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Rated Tools Section -->
+  <div class="{% if user_theme == 'dark' %}bg-gray-800 border-gray-600{% else %}bg-white border-gray-200{% endif %} border rounded-lg p-6 shadow">
+    <h3 class="text-xl font-semibold mb-4 {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">🏆 Top Rated Tools</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for tool in top_rated_tools %}
+      <div class="{% if user_theme == 'dark' %}bg-gray-700{% else %}bg-gray-50{% endif %} rounded-lg p-4">
+        <div class="flex items-center justify-between">
+          <span class="{% if user_theme == 'dark' %}text-gray-200{% else %}text-gray-800{% endif %} font-medium">{{ tool.name }}</span>
+          <span class="text-sm {% if user_theme == 'dark' %}text-gray-400{% else %}text-gray-600{% endif %}">{{ tool.avg_rating|floatformat:1 }}★ ({{ tool.review_count }})</span>
+        </div>
+      </div>
+      {% empty %}
+      <p class="{% if user_theme == 'dark' %}text-gray-400{% else %}text-gray-600{% endif %}">No ratings yet</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Category Ratings Charts -->
+  {% if category_charts %}
+  <div class="{% if user_theme == 'dark' %}bg-gray-800 border-gray-600{% else %}bg-white border-gray-200{% endif %} border rounded-lg p-6 shadow">
+    <h3 class="text-xl font-semibold mb-6 {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">📊 AI Tool Ratings by Category</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {% for chart in category_charts %}
+      <div class="{% if user_theme == 'dark' %}bg-gray-700{% else %}bg-gray-50{% endif %} rounded-lg p-4">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="text-lg font-medium {% if user_theme == 'dark' %}text-gray-200{% else %}text-gray-800{% endif %}">{{ chart.category_name }}</h4>
+          <span class="text-sm {% if user_theme == 'dark' %}text-gray-400{% else %}text-gray-600{% endif %}">{{ chart.tool_count }} tools</span>
+        </div>
+        <div class="flex justify-center">
+          <canvas id="chart-{{ forloop.counter }}" height="250" width="250"></canvas>
+        </div>
+        {% if not chart.has_reviews and chart.tool_count > 0 %}
+        <p class="text-center text-sm {% if user_theme == 'dark' %}text-gray-400{% else %}text-gray-600{% endif %} mt-2">No reviews yet</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+
+</div>
+
+<!-- Chart.js Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Access Type Distribution Chart
+  const accessTypeCtx = document.getElementById('accessTypeChart').getContext('2d');
+  new Chart(accessTypeCtx, {
+    type: 'doughnut',
+    data: {
+      labels: [{% for item in access_type_stats %}'{{ item.access_type }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+      datasets: [{
+        data: [{% for item in access_type_stats %}{{ item.count }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+        backgroundColor: ['#60A5FA', '#34D399', '#FBBF24'],
+        borderColor: '{% if user_theme == "dark" %}#374151{% else %}#E5E7EB{% endif %}',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: '{% if user_theme == "dark" %}#9CA3AF{% else %}#6B7280{% endif %}',
+            padding: 10
+          }
+        }
+      }
+    }
+  });
+
+  // Category Charts - All Pie Charts
   {% for chart in category_charts %}
-    <div class="mb-12">
-      <h3 class="text-xl font-semibold mb-2 text-gray-800">{{ chart.category_name }}</h3>
-      <canvas id="chart-{{ forloop.counter }}"></canvas>
-      <script>
-        const ctx{{ forloop.counter }} = document.getElementById('chart-{{ forloop.counter }}').getContext('2d');
-
-        new Chart(ctx{{ forloop.counter }}, {
-          type: '{{ chart.chart_type }}',
-          data: {
-            labels: {{ chart.tools|pluck:"name"|safe }},
-            datasets: [{
-              label: 'Average Rating',
-              data: {{ chart.tools|pluck:"avg_rating"|safe }},
-              backgroundColor: [
-                '#60A5FA', '#34D399', '#FBBF24', '#F87171',
-                '#A78BFA', '#F472B6', '#4ADE80', '#F9A8D4',
-                '#FDBA74', '#86EFAC'
-              ],
-              borderColor: '#fff',
-              borderWidth: 1
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: {
-                display: {% if chart.chart_type == "pie" %}true{% else %}false{% endif %}
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                max: 5,
-                title: {
-                  display: true,
-                  text: 'Avg Rating'
-                }
-              }
+  const ctx{{ forloop.counter }} = document.getElementById('chart-{{ forloop.counter }}').getContext('2d');
+  
+  // Generate colors for each tool
+  const colors{{ forloop.counter }} = [
+    '#3B82F6', '#10B981', '#F59E0B', '#EF4444',
+    '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16',
+    '#F97316', '#6366F1', '#14B8A6', '#F43F5E'
+  ];
+  
+  new Chart(ctx{{ forloop.counter }}, {
+    type: 'pie',
+    data: {
+      labels: [{% for tool in chart.tools %}'{{ tool.name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+      datasets: [{
+        data: [{% for tool in chart.tools %}{{ tool.avg_rating }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+        backgroundColor: colors{{ forloop.counter }}.slice(0, {{ chart.tools|length }}),
+        borderColor: '{% if user_theme == "dark" %}#374151{% else %}#E5E7EB{% endif %}',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            color: '{% if user_theme == "dark" %}#9CA3AF{% else %}#6B7280{% endif %}',
+            padding: 8,
+            usePointStyle: true,
+            font: {
+              size: 11
             }
           }
-        });
-      </script>
-    </div>
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.parsed.toFixed(1) + '★';
+            }
+          }
+        }
+      }
+    }
+  });
   {% endfor %}
-{% else %}
-  <p>No rating data available yet.</p>
-{% endif %}
+</script>
 {% endblock %}

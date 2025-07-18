@@ -1,23 +1,23 @@
 {% extends "dashboard/base.html" %}
 {% block content %}
-<h2 class="text-2xl font-bold mb-6">📜 Your Tool History</h2>
+<h2 class="text-2xl font-bold mb-6 {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">📜 {{ translations.Your_Tool_History|default:"Your Tool History" }}</h2>
 
 {% if history %}
   <ul class="space-y-4">
     {% for record in history %}
-      <li class="bg-white p-4 rounded shadow flex items-center gap-4">
+      <li class="{% if user_theme == 'dark' %}bg-gray-800{% else %}bg-white{% endif %} p-4 rounded shadow flex items-center gap-4">
         {% if record.tool.logo %}
           <img src="{{ record.tool.logo.url }}" alt="{{ record.tool.name }}" class="w-12 h-12 object-contain">
         {% endif %}
         <div>
-          <h3 class="text-lg font-semibold">{{ record.tool.name }}</h3>
-          <p class="text-sm text-gray-600">Category: {{ record.tool.category.name }}</p>
-          <p class="text-xs text-gray-500">Viewed on {{ record.accessed_at|date:"M d, Y H:i" }}</p>
+          <h3 class="text-lg font-semibold {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">{{ record.tool.name }}</h3>
+          <p class="text-sm {% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %}">{{ translations.Category|default:"Category" }}: {{ record.tool.category.name }}</p>
+          <p class="text-xs {% if user_theme == 'dark' %}text-gray-400{% else %}text-gray-500{% endif %}">{{ translations.Viewed_on|default:"Viewed on" }} {{ record.accessed_at|date:"M d, Y H:i" }}</p>
         </div>
       </li>
     {% endfor %}
   </ul>
 {% else %}
-  <p>You haven’t viewed any tools yet.</p>
+  <p class="{% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-700{% endif %}">{{ translations.You_havent_viewed_any_tools_yet|default:"You haven't viewed any tools yet." }}</p>
 {% endif %}
 {% endblock %}

@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from tools.models import Tool
 from .models import Review
 from .forms import ReviewForm
@@ -20,7 +20,7 @@ def add_review(request, tool_id):
             review = form.save(commit=False)
             review.user = request.user
             review.tool = tool
-            review.rating = float(form.cleaned_data['stars'])
+            review.stars = int(form.cleaned_data['stars'])
             review.save()
             messages.success(request, "Your review has been submitted successfully.")
             return redirect('tools:tool_detail', tool_id=tool.id)

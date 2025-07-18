@@ -1,0 +1,15 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<div class="max-w-6xl mx-auto mt-10">
+  <h2 class="text-3xl font-bold mb-6">Browse by Categories</h2>
+  <div class="flex flex-wrap gap-8 justify-center">
+    {% for category in categories %}
+      <a href="{% url 'tools:by_category' category.id %}"
+         class="flex items-center justify-center w-64 h-40 rounded-3xl shadow-lg transition-all text-center text-2xl font-semibold bg-gradient-to-br
+         {% if user_theme == 'dark' %}from-blue-900 via-gray-800 to-purple-900 text-white hover:from-blue-800 hover:to-purple-800{% else %}from-blue-400 via-purple-300 to-purple-500 text-white hover:from-blue-500 hover:to-purple-600{% endif %}">
+        {{ category.name }}
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %} 

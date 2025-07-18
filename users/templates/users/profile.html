@@ -1,13 +1,61 @@
 {% extends "dashboard/base.html" %}
+{% load widget_tweaks %}
+
 {% block content %}
-<h2 class="text-xl font-bold mb-4">My Profile</h2>
-<ul class="list-disc pl-4 space-y-1">
-    <li><strong>Username:</strong> {{ user.username }}</li>
-    <li><strong>Email:</strong> {{ user.email }}</li>
-    <li><strong>Name:</strong> {{ user.userprofile.name }}</li>
-</ul>
-<div class="mt-4 space-x-4">
-    <a href="{% url 'users:password_change' %}" class="text-blue-600 underline">Change Password</a>
-    <a href="{% url 'users:user_settings' %}" class="text-blue-600 underline">Edit Settings</a>
+<div class="max-w-4xl mx-auto {% if user_theme == 'dark' %}bg-gray-800{% else %}bg-white{% endif %} p-6 rounded shadow">
+  <h2 class="text-2xl font-bold mb-6 {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">👤 My Profile</h2>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- Profile Information -->
+    <div class="{% if user_theme == 'dark' %}bg-gray-700{% else %}bg-gray-50{% endif %} p-6 rounded-lg">
+      <h3 class="text-lg font-semibold mb-4 {% if user_theme == 'dark' %}text-gray-200{% else %}text-gray-800{% endif %}">Profile Information</h3>
+      <div class="space-y-3">
+        <div class="flex justify-between">
+          <span class="{% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %}">Username:</span>
+          <span class="{% if user_theme == 'dark' %}text-white{% else %}text-gray-900{% endif %} font-medium">{{ user.username }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="{% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %}">Email:</span>
+          <span class="{% if user_theme == 'dark' %}text-white{% else %}text-gray-900{% endif %} font-medium">{{ user.email }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="{% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %}">Full Name:</span>
+          <span class="{% if user_theme == 'dark' %}text-white{% else %}text-gray-900{% endif %} font-medium">{{ profile.name }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="{% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %}">Date Joined:</span>
+          <span class="{% if user_theme == 'dark' %}text-white{% else %}text-gray-900{% endif %} font-medium">{{ user.date_joined|date:"M d, Y" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Settings -->
+    <div class="{% if user_theme == 'dark' %}bg-gray-700{% else %}bg-gray-50{% endif %} p-6 rounded-lg">
+      <h3 class="text-lg font-semibold mb-4 {% if user_theme == 'dark' %}text-gray-200{% else %}text-gray-800{% endif %}">Current Settings</h3>
+      <div class="space-y-3">
+        <div class="flex justify-between">
+          <span class="{% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %}">Theme:</span>
+          <span class="{% if user_theme == 'dark' %}text-white{% else %}text-gray-900{% endif %} font-medium capitalize">{{ user_settings.theme }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="{% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-600{% endif %}">Language:</span>
+          <span class="{% if user_theme == 'dark' %}text-white{% else %}text-gray-900{% endif %} font-medium">{{ user_settings.get_language_display }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="mt-8 flex flex-wrap gap-4">
+    <a href="{% url 'users:change_password' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded transition duration-200">
+      🔐 Change Password
+    </a>
+    <a href="{% url 'users:settings' %}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded transition duration-200">
+      ⚙️ Edit Settings
+    </a>
+    <a href="{% url 'users:help' %}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded transition duration-200">
+      ❓ Help & Support
+    </a>
+  </div>
 </div>
 {% endblock %}

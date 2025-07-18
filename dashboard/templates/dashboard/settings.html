@@ -1,6 +1,6 @@
 {% extends "dashboard/base.html" %}
 
 {% block content %}
-<h2 class="text-2xl font-bold">Settings Page</h2>
-<p>User settings .</p>
+<h2 class="text-2xl font-bold {% if user_theme == 'dark' %}text-white{% else %}text-black{% endif %}">Settings Page</h2>
+<p class="{% if user_theme == 'dark' %}text-gray-300{% else %}text-gray-700{% endif %}">User settings .</p>
 {% endblock %}

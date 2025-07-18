@@ -16,5 +16,6 @@ def toggle_favourite(request, tool_id):
 
     if not created:
         favourite.delete()
-    return redirect('dashboard:favourites')
+    # Redirect back to tool detail page
+    return redirect('tools:tool_detail', tool_id=tool.id)
 
